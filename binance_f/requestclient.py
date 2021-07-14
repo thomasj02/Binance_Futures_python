@@ -5,8 +5,14 @@ from binance_f.model.constant import *
 
 
 class RequestClient(object):
-
-    def __init__(self, **kwargs):
+    def __init__(
+            self,
+            api_key: str = None,
+            secret_key: str = None,
+            url: str = RestApiDefine.Url,
+            enable_debug: bool = False,
+            raw_json: bool = False
+    ):
         """
         Create the request client instance.
         :param kwargs: The option of request connection.
@@ -14,19 +20,12 @@ class RequestClient(object):
             secret_key: The private key applied from Binance.
             server_url: The URL name like "https://api.binance.com".
         """
-        api_key = None
-        secret_key = None
-        url = RestApiDefine.Url
-        if "api_key" in kwargs:
-            api_key = kwargs["api_key"]
-        if "secret_key" in kwargs:
-            secret_key = kwargs["secret_key"]
-        if "url" in kwargs:
-            url = kwargs["url"]
-        try:
-            self.request_impl = RestApiRequestImpl(api_key, secret_key, url)
-        except Exception:
-            pass
+        self.request_impl = RestApiRequestImpl(
+            api_key=api_key,
+            secret_key=secret_key,
+            server_url=url,
+            enable_debug=enable_debug,
+            raw_json=raw_json)
         self.limits = {}
     
     def refresh_limits(self,limits):
