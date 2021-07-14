@@ -1,7 +1,6 @@
 from binance_f.impl import RestApiRequest
 from binance_f.impl.utils.urlparamsbuilder import UrlParamsBuilder
 from binance_f.impl.utils.apisignature import create_signature
-from binance_f.impl.utils.apisignature import create_signature_with_query
 from binance_f.impl.utils.inputchecker import *
 from binance_f.impl.utils.timeservice import *
 from binance_f.model import *
@@ -10,11 +9,12 @@ from binance_f.base.printobject import *
 
 
 class RestApiRequestImpl(object):
-
-    def __init__(self, api_key, secret_key, server_url="https://fapi.binance.com"):
+    def __init__(self, api_key, secret_key, server_url="https://fapi.binance.com", raw_json=False, enable_debug=False):
         self.__api_key = api_key
         self.__secret_key = secret_key
         self.__server_url = server_url
+        self._raw_json = raw_json
+        self._enable_debug = enable_debug
 
     def __create_request_by_get(self, url, builder):
         request = RestApiRequest()
@@ -32,10 +32,11 @@ class RestApiRequestImpl(object):
         request.header.update({"X-MBX-APIKEY": self.__api_key})
         request.url = url + "?" + builder.build_url()
          # For develop
-        print("====== Request ======")
-        print(request)
-        PrintMix.print_data(request)
-        print("=====================")
+        if self._enable_debug:
+            print("====== Request ======")
+            print(request)
+            PrintMix.print_data(request)
+            print("=====================")
         return request
 
     def __create_request_by_post_with_signature(self, url, builder):
@@ -50,10 +51,11 @@ class RestApiRequestImpl(object):
         request.post_body = builder.post_map
         request.url = url + "?" + builder.build_url()
         # For develop
-        print("====== Request ======")
-        print(request)
-        PrintMix.print_data(request)
-        print("=====================")
+        if self._enable_debug:
+            print("====== Request ======")
+            print(request)
+            PrintMix.print_data(request)
+            print("=====================")
         return request
 
     def __create_request_by_delete_with_signature(self, url, builder):
@@ -67,10 +69,11 @@ class RestApiRequestImpl(object):
         request.header.update({"X-MBX-APIKEY": self.__api_key})
         request.url = url + "?" + builder.build_url()
         # For develop
-        print("====== Request ======")
-        print(request)
-        PrintMix.print_data(request)
-        print("=====================")
+        if self._enable_debug:
+            print("====== Request ======")
+            print(request)
+            PrintMix.print_data(request)
+            print("=====================")
         return request
 
     def __create_request_by_get_with_signature(self, url, builder):
@@ -84,10 +87,11 @@ class RestApiRequestImpl(object):
         request.header.update({"X-MBX-APIKEY": self.__api_key})
         request.url = url + "?" + builder.build_url()
         # For develop
-        print("====== Request ======")
-        print(request)
-        PrintMix.print_data(request)
-        print("=====================")
+        if self._enable_debug:
+            print("====== Request ======")
+            print(request)
+            PrintMix.print_data(request)
+            print("=====================")
         return request
 
     def __create_request_by_put_with_signature(self, url, builder):
@@ -101,10 +105,11 @@ class RestApiRequestImpl(object):
         request.header.update({"X-MBX-APIKEY": self.__api_key})
         request.url = url + "?" + builder.build_url()
         # For develop
-        print("====== Request ======")
-        print(request)
-        PrintMix.print_data(request)
-        print("=====================")
+        if self._enable_debug:
+            print("====== Request ======")
+            print(request)
+            PrintMix.print_data(request)
+            print("=====================")
         return request
         
     def get_servertime(self):
@@ -112,6 +117,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/time", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = json_wrapper.get_int("serverTime")
             return result
 
@@ -123,6 +130,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/exchangeInfo", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = ExchangeInformation.json_parse(json_wrapper)
             return result
 
@@ -138,6 +147,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/depth", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = OrderBook.json_parse(json_wrapper)
             return result
 
@@ -153,6 +164,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/trades", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -173,6 +186,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_apikey("/fapi/v1/historicalTrades", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -195,6 +210,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/aggTrades", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             aggregate_trades_list = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -218,6 +235,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/klines", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -236,6 +255,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/premiumIndex", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = MarkPrice.json_parse(json_wrapper)
             return result
 
@@ -253,6 +274,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/fundingRate", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -270,8 +293,9 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/ticker/24hr", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
-
             if symbol:
                 element = TickerPriceChangeStatistics.json_parse(json_wrapper)
                 result.append(element)
@@ -293,6 +317,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/ticker/price", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             if symbol:
                 element = SymbolPrice.json_parse(json_wrapper)
@@ -314,6 +340,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/ticker/bookTicker", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             if symbol:
                 element = SymbolOrderBook.json_parse(json_wrapper)
@@ -336,6 +364,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/openInterest", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             element = OpenInterest.json_parse(json_wrapper)
             result.append(element)
@@ -355,6 +385,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/allForceOrders", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -374,25 +406,25 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_post_with_signature("/fapi/v1/positionSide/dual", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = CodeMsg.json_parse(json_wrapper)
             return result
 
         request.json_parser = parse
         return request
 
-
     def get_position_mode(self):
-        
         request = self.__create_request_by_get_with_signature("/fapi/v1/positionSide/dual", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = PositionMode.json_parse(json_wrapper)
             return result
 
         request.json_parser = parse
         return request
-
-
 
     def post_order(self, symbol, side, ordertype, 
                 timeInForce, quantity, reduceOnly, price, newClientOrderId, stopPrice, workingType, closePosition, positionSide, callbackRate, activationPrice, newOrderRespType):
@@ -416,10 +448,11 @@ class RestApiRequestImpl(object):
         builder.put_url("activationPrice", activationPrice)
         builder.put_url("newOrderRespType", newOrderRespType)
 
-
         request = self.__create_request_by_post_with_signature("/fapi/v1/order", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = Order.json_parse(json_wrapper)
             return result
 
@@ -436,6 +469,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v1/order", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = Order.json_parse(json_wrapper)
             return result
 
@@ -452,6 +487,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_delete_with_signature("/fapi/v1/order", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = Order.json_parse(json_wrapper)
             return result
 
@@ -466,6 +503,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_delete_with_signature("/fapi/v1/allOpenOrders", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = CodeMsg.json_parse(json_wrapper)
             return result
 
@@ -481,6 +520,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_delete_with_signature("/fapi/v1/batchOrders", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -501,6 +542,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v1/openOrders", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -523,6 +566,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v1/allOrders", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -539,6 +584,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v1/balance", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -555,6 +602,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v1/account", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = AccountInformation.json_parse(json_wrapper)
             return result
 
@@ -571,6 +620,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_post_with_signature("/fapi/v1/leverage", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = Leverage.json_parse(json_wrapper)
             return result
 
@@ -587,6 +638,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_post_with_signature("/fapi/v1/marginType", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = CodeMsg.json_parse(json_wrapper)
             return result
 
@@ -605,6 +658,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_post_with_signature("/fapi/v1/positionMargin", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = PositionMargin.json_parse(json_wrapper)
             return result
 
@@ -623,6 +678,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v1/positionMargin/history", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -640,6 +697,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v1/positionRisk", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -662,6 +721,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v1/userTrades", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -683,6 +744,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v1/income", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -699,6 +762,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_post_with_signature("/fapi/v1/listenKey", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = json_wrapper.get_string("listenKey")
             return result
 
@@ -711,6 +776,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_put_with_signature("/fapi/v1/listenKey", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = "OK"
             return result
 
@@ -723,6 +790,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_delete_with_signature("/fapi/v1/listenKey", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = "OK"
             return result
 
@@ -741,6 +810,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/futures/data/openInterestHist", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -762,6 +833,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/futures/data/topLongShortAccountRatio", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -783,6 +856,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/futures/data/topLongShortPositionRatio", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -804,6 +879,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/futures/data/globalLongShortAccountRatio", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -825,6 +902,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/futures/data/takerlongshortRatio", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -848,6 +927,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/lvtKlines", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -866,6 +947,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get("/fapi/v1/indexInfo", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             element = IndexInfo.json_parse(json_wrapper)
             result.append(element)
@@ -884,6 +967,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_post_with_signature("/fapi/v1/countdownCancelAll", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = CountdownCancelAll.json_parse(json_wrapper)
             return result
 
@@ -896,6 +981,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v2/balance", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -912,6 +999,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v2/account", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = AccountInformationV2.json_parse(json_wrapper)
             return result
 
@@ -924,6 +1013,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v2/positionRisk", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -941,6 +1032,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v1/leverageBracket", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -959,6 +1052,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v1/adlQuantile", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = list()
             data_list = json_wrapper.convert_2_array()
             for item in data_list.get_items():
@@ -976,6 +1071,8 @@ class RestApiRequestImpl(object):
         request = self.__create_request_by_get_with_signature("/fapi/v1/apiTradingStatus", builder)
 
         def parse(json_wrapper):
+            if self._raw_json:
+                return json_wrapper.json_object
             result = ApiTradingStatus.json_parse(json_wrapper)
             return result
 

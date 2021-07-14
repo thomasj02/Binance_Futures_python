@@ -1,18 +1,11 @@
 import threading
 import websocket
-import gzip
 import ssl
 import logging
-from urllib import parse
-import urllib.parse
 
-from binance_f.base.printtime import PrintDate
 from binance_f.impl.utils.timeservice import get_current_timestamp
-from binance_f.impl.utils.urlparamsbuilder import UrlParamsBuilder
-from binance_f.impl.utils.apisignature import create_signature
 from binance_f.exception.binanceapiexception import BinanceApiException
 from binance_f.impl.utils import *
-from binance_f.base.printobject import *
 from binance_f.model.constant import *
 # Key: ws, Value: connection
 websocket_connection_handler = dict()
@@ -129,13 +122,13 @@ class WebsocketConnection:
 
     def on_error(self, error_message):
         if self.request.error_handler is not None:
-            print('error')
+            # print('error')
             exception = BinanceApiException(BinanceApiException.SUBSCRIPTION_ERROR, error_message)
             self.request.error_handler(exception)
         self.logger.error("[Sub][" + str(self.id) + "] " + str(error_message))
 
     def on_failure(self, error):
-        print('on_failure')
+        # print('on_failure')
         self.on_error("Unexpected error: " + str(error))
         self.close_on_error()
 

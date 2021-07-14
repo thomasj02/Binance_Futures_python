@@ -1,12 +1,7 @@
-import time
 from binance_f.impl.websocketrequest import WebsocketRequest
 from binance_f.impl.utils.channels import *
-from binance_f.impl.utils.channelparser import ChannelParser
-from binance_f.impl.utils.timeservice import *
 from binance_f.impl.utils.inputchecker import *
 from binance_f.model import *
-# For develop
-from binance_f.base.printobject import *
 
 
 class WebsocketRequestImpl(object):
@@ -281,7 +276,7 @@ class WebsocketRequestImpl(object):
         return request
 
   
-    def subscribe_user_data_event(self, listenKey, callback, error_handler=None):
+    def subscribe_user_data_event(self, listenKey, callback, error_handler=None, raw_json=False):
         check_should_not_none(listenKey, "listenKey")
         check_should_not_none(callback, "callback")
 
@@ -290,13 +285,13 @@ class WebsocketRequestImpl(object):
             time.sleep(0.01)
 
         def json_parse(json_wrapper):
-            print("event type: ", json_wrapper.get_string("e"))
-            print(json_wrapper)
-            if(json_wrapper.get_string("e") == "ACCOUNT_UPDATE"):
+            if raw_json:
+                return json_wrapper.json_object
+            if json_wrapper.get_string("e") == "ACCOUNT_UPDATE":
                 result = AccountUpdate.json_parse(json_wrapper)
-            elif(json_wrapper.get_string("e") == "ORDER_TRADE_UPDATE"):
+            elif json_wrapper.get_string("e") == "ORDER_TRADE_UPDATE":
                 result = OrderUpdate.json_parse(json_wrapper)
-            elif(json_wrapper.get_string("e") == "listenKeyExpired"):
+            elif json_wrapper.get_string("e") == "listenKeyExpired":
                 result = ListenKeyExpired.json_parse(json_wrapper)
             return result
 
